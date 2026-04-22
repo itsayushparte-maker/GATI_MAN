@@ -1,0 +1,126 @@
+================================================================================
+FitPredict AI - Quick Start Guide
+================================================================================
+
+PROJECT OVERVIEW:
+FitPredict AI is a full-stack Machine Learning web application that predicts
+athletic performance using a Random Forest Classifier trained on Strava data.
+
+================================================================================
+EXECUTION STEPS:
+================================================================================
+
+STEP 1: Install Python Dependencies
+------------------------------------
+Command:
+    pip3 install -r requirements.txt
+
+Status: ✓ COMPLETE (All libraries installed)
+
+
+STEP 2: Train the Machine Learning Model
+-----------------------------------------
+Command:
+    python3 train_model.py
+
+Status: ✓ COMPLETE (Model trained with 90.91% accuracy)
+Output: fitpredict_model.pkl (82.67 KB)
+
+
+STEP 3: Start the FastAPI Backend Server
+------------------------------------------
+Command:
+    python3 main.py
+
+Status: ✓ RUNNING (Server active on http://localhost:8000)
+API Documentation: http://localhost:8000/api/docs
+
+
+STEP 4: Open the Frontend
+---------------------------
+Command:
+    open index.html
+
+Status: ✓ OPENED (Browser launched)
+
+================================================================================
+TESTING THE APPLICATION:
+================================================================================
+
+1. Enter run parameters in the web form:
+   - Target Distance (km): e.g., 5.0, 10.0, 15.0
+   - Route Elevation (m): e.g., 50, 120, 200
+   - Rest Days: e.g., 2
+   - Run Time (Hour): e.g., 7 (for 7 AM)
+
+2. Click "Predict Success Probability"
+
+3. View results:
+   - Green (70%+): High likelihood of success
+   - Orange (40-70%): Moderate chance
+   - Red (<40%): Low probability
+
+================================================================================
+API TESTING (Terminal):
+================================================================================
+
+Test prediction endpoint:
+    curl -X POST http://localhost:8000/api/predict \
+      -H "Content-Type: application/json" \
+      -d '{"distance_km": 5.0, "elevation_gain": 50.0, "days_since_last_run": 2, "hour_of_day": 7}'
+
+Expected response:
+    {
+      "success_probability": 100.0,
+      "prediction_class": "Likely Success",
+      "confidence_level": "High",
+      "timestamp": "2026-04-21T23:08:45.970879",
+      "input_features": {...}
+    }
+
+================================================================================
+PROJECT FILES:
+================================================================================
+
+✓ extended_strava_data.csv    - Training dataset (51 records)
+✓ train_model.py              - ML model training script
+✓ main.py                     - FastAPI backend server
+✓ index.html                  - Frontend UI (Tailwind CSS)
+✓ requirements.txt            - Python dependencies
+✓ fitpredict_model.pkl        - Trained model (generated)
+✓ RUN.md                      - Detailed documentation
+✓ QUICK_START.txt             - This file
+
+================================================================================
+TECHNOLOGY STACK:
+================================================================================
+
+Backend & ML:
+  - Python 3.13
+  - FastAPI 0.116.2
+  - Scikit-Learn 1.7.2
+  - Pandas 2.3.3
+  - NumPy 2.4.4
+  - Joblib 1.5.2
+
+Frontend:
+  - HTML5, CSS3, Vanilla JavaScript
+  - Tailwind CSS (CDN)
+  - Fetch API
+
+================================================================================
+TROUBLESHOOTING:
+================================================================================
+
+If server is already running on port 8000:
+    lsof -ti:8000 | xargs kill
+
+To restart the server:
+    python3 main.py
+
+To retrain the model:
+    python3 train_model.py
+
+================================================================================
+MADE BY FitPredict AI Team
+================================================================================

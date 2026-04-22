@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPredict AI - Advanced Athletic Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'athletic': {
+                            'dark': '#0a0a0f',
+                            'card': '#12121a',
+                            'border': '#1e1e2e',
+                            'accent': '#00d4ff',
+                            'success': '#10b981',
+                            'warning': '#f59e0b',
+                            'danger': '#ef4444',
+                            'purple': '#8b5cf6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+        }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-accent { background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15); }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+        .input-field { transition: all 0.2s ease; }
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .select-field {
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+        .select-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(18, 18, 26, 0.8) 0%, rgba(30, 30, 46, 0.4) 100%);
+            border: 1px solid rgba(30, 30, 46, 0.6);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in { animation: slideIn 0.5s ease-out; }
+    </style>
+</head>
+<body class="bg-athletic-dark text-white min-h-screen">
+    
+    <!-- Header -->
+    <header class="border-b border-athletic-border bg-athletic-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-semibold tracking-tight">FitPredict AI</h1>
+                        <p class="text-xs text-gray-400 font-medium">Advanced Athletic Analytics</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-gray-400">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>Model Online</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Input Panel -->
+            <div class="lg:col-span-4">
+                <div class="bg-athletic-card rounded-2xl border border-athletic-border p-6 card-hover sticky top-20">
+                    <div class="mb-6">
+                        <h2 class="text-lg font-semibold mb-1">Run Configuration</h2>
+                        <p class="text-xs text-gray-400">Select your run details below</p>
+                    </div>
+                    
+                    <form id="predictionForm" class="space-y-5">
+                        <!-- Target Distance (Numeric Input) -->
+                        <div>
+                            <label class="block text-xs font-medium mb-2 text-gray-300">Target Distance (km)</label>
+                            <input type="number" id="distance" step="0.1" min="0.1" max="100" value="5.0"
+                                class="input-field w-full px-4 py-2.5 bg-athletic-dark border border-athletic-border rounded-lg text-white text-sm" 
+                                placeholder="e.g., 5.0, 10.0, 15.0"
+                                required>
+                            <p class="text-xs text-gray-500 mt-1">Common: 5K, 10K, Half Marathon</p>
+                        </div>
+                        
+                        <!-- Route Type (Dropdown) -->
+                        <div>
+                            <label class="block text-xs font-medium mb-2 text-gray-300">Route Type</label>
+                            <select id="routeType" 
+                                class="select-field w-full px-4 py-2.5 bg-athletic-dark border border-athletic-border rounded-lg text-white text-sm cursor-pointer"
+                                required>
+                                <option value="5" class="bg-athletic-dark">Flat Track / Stadium</option>
+                                <option value="25" selected class="bg-athletic-dark">Normal City Roads</option>
+                                <option value="60" class="bg-athletic-dark">Hilly / Tough Route</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Select the type of terrain</p>
+                        </div>
+                        
+                        <!-- Fatigue Level (Dropdown) -->
+                        <div>
+                            <label class="block text-xs font-medium mb-2 text-gray-300">Fatigue Level</label>
+                            <select id="fatigueLevel" 
+                                class="select-field w-full px-4 py-2.5 bg-athletic-dark border border-athletic-border rounded-lg text-white text-sm cursor-pointer"
+                                required>
+                                <option value="0" class="bg-athletic-dark">Ran Today (Tired)</option>
+                                <option value="1" selected class="bg-athletic-dark">Ran Yesterday (Normal)</option>
+                                <option value="2.5" class="bg-athletic-dark">Rested for 2+ Days (Fresh)</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">When did you last run?</p>
+                        </div>
+                        
+                        <!-- Time of Day (Dropdown) -->
+                        <div>
+                            <label class="block text-xs font-medium mb-2 text-gray-300">Time of Day</label>
+                            <select id="timeOfDay" 
+                                class="select-field w-full px-4 py-2.5 bg-athletic-dark border border-athletic-border rounded-lg text-white text-sm cursor-pointer"
+                                required>
+                                <option value="6" class="bg-athletic-dark">Early Morning (6 AM)</option>
+                                <option value="18" selected class="bg-athletic-dark">Evening (6 PM)</option>
+                                <option value="22" class="bg-athletic-dark">Late Night (10 PM)</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">When will you run?</p>
+                        </div>
+                        
+                        <button type="submit" id="predictBtn" class="btn-primary w-full py-3 rounded-lg font-medium text-white shadow-lg text-sm">
+                            <span id="btnText">Generate Athletic Report</span>
+                            <span id="btnLoading" class="hidden">
+                                <svg class="animate-spin inline h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Analyzing...
+                            </span>
+                        </button>
+                    </form>
+                    
+                    <div id="errorMessage" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
+                        <p class="text-xs text-red-400"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Dashboard -->
+            <div class="lg:col-span-8">
+                <div id="resultsDashboard" class="hidden">
+                    <!-- Welcome Message -->
+                    <div id="welcomeMessage" class="mb-6">
+                        <h2 class="text-2xl font-semibold mb-1">Your Athletic Performance Report</h2>
+                        <p class="text-sm text-gray-400">Comprehensive AI-powered analysis</p>
+                    </div>
+                    
+                    <!-- 2x3 Grid of Metric Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                        
+                        <!-- Card 1: Predicted Pace & Finish Time -->
+                        <div class="metric-card rounded-xl p-5 card-hover slide-in" style="animation-delay: 0.1s">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Pace & Finish Time</h3>
+                                <svg class="w-5 h-5 text-athletic-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-1">Predicted Pace</p>
+                                    <p id="predictedPace" class="text-3xl font-bold text-athletic-accent">--</p>
+                                    <p class="text-xs text-gray-400">min/km</p>
+                                </div>
+                                <div class="pt-2 border-t border-athletic-border">
+                                    <p class="text-xs text-gray-500 mb-1">Total Finish Time</p>
+                                    <p id="predictedTime" class="text-2xl font-bold text-white">--</p>
+                                    <p class="text-xs text-gray-400 mt-1">for entered distance</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 2: 5K & 10K Predictions -->
+                        <div class="metric-card rounded-xl p-5 card-hover slide-in" style="animation-delay: 0.2s">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Distance Projections</h3>
+                                <svg class="w-5 h-5 text-athletic-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-gray-500">5K Time</p>
+                                        <p id="predicted5k" class="text-2xl font-bold text-athletic-purple">--</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs text-gray-500">10K Time</p>
+                                        <p id="predicted10k" class="text-2xl font-bold text-athletic-purple">--</p>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t border-athletic-border">
+                                    <p class="text-xs text-gray-400">Based on predicted pace</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 3: Calories Burned -->
+                        <div class="metric-card rounded-xl p-5 card-hover slide-in" style="animation-delay: 0.3s">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Calories Burned</h3>
+                                <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <p id="caloriesBurned" class="text-4xl font-bold text-orange-500">--</p>
+                                <p class="text-sm text-gray-400">calories burned</p>
+                                <div class="pt-2 border-t border-athletic-border">
+                                    <p class="text-xs text-gray-500">Formula: Distance (km) x 65</p>
+                                    <p class="text-xs text-gray-500">Approximate estimate</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 4: Global Ranking -->
+                        <div class="metric-card rounded-xl p-5 card-hover slide-in" style="animation-delay: 0.4s">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Global Ranking</h3>
+                                <svg class="w-5 h-5 text-athletic-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <p id="globalPercentile" class="text-4xl font-bold text-athletic-success">--</p>
+                                <p class="text-sm text-gray-400">percentile globally</p>
+                                <div class="pt-2 border-t border-athletic-border">
+                                    <p class="text-xs text-gray-500">Top <span id="topPercent">--</span>% of runners</p>
+                                    <p class="text-xs text-gray-500">Global avg: 30 min 5K</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 5: Defense Exam Eligibility -->
+                        <div class="metric-card rounded-xl p-5 card-hover slide-in md:col-span-2" style="animation-delay: 0.5s">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xs font-medium text-gray-400 uppercase tracking-wide">Defense Exam Physical Eligibility</h3>
+                                <svg class="w-5 h-5 text-athletic-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-gray-500 mb-1">State Police/SI Physical Test (5K)</p>
+                                        <p id="petEligibility" class="text-lg font-bold">--</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs text-gray-500">Required Cutoff</p>
+                                        <p class="text-lg font-bold text-white">25:00</p>
+                                    </div>
+                                </div>
+                                <div class="pt-3 border-t border-athletic-border">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-gray-500">Standard: 25-minute 5K run</span>
+                                        <span id="eligibilityStatus" class="font-medium">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timestamp -->
+                    <div class="text-center text-xs text-gray-500">
+                        <p>Report generated at <span id="timestamp" class="font-mono">--</span></p>
+                    </div>
+                </div>
+                
+                <!-- Placeholder when no results -->
+                <div id="placeholder" class="flex flex-col items-center justify-center h-96 text-center">
+                    <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Ready to Analyze</h3>
+                    <p class="text-sm text-gray-400 max-w-md">Select your run details and click "Generate Athletic Report" to see your comprehensive performance analytics</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="border-t border-athletic-border mt-16 py-6">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-xs text-gray-500">FitPredict AI v2.0 - Advanced Athletic Analytics Platform</p>
+        </div>
+    </footer>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        const form = document.getElementById('predictionForm');
+        const predictBtn = document.getElementById('predictBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsDashboard = document.getElementById('resultsDashboard');
+        const placeholder = document.getElementById('placeholder');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMessage.classList.add('hidden');
+            predictBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+            
+            // Get values from human-friendly form inputs
+            const distanceKm = parseFloat(document.getElementById('distance').value);
+            const elevationGain = parseFloat(document.getElementById('routeType').value);
+            const daysSinceLastRun = parseFloat(document.getElementById('fatigueLevel').value);
+            const hourOfDay = parseInt(document.getElementById('timeOfDay').value);
+            
+            // Prepare data for backend (convert to expected format)
+            const predictionData = {
+                distance_km: distanceKm,
+                elevation_gain: elevationGain,
+                days_since_last_run: daysSinceLastRun,
+                hour_of_day: hourOfDay
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(predictionData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Prediction failed');
+                }
+                
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                predictBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        });
+        
+        function displayResults(result) {
+            placeholder.classList.add('hidden');
+            resultsDashboard.classList.remove('hidden');
+            
+            // Card 1: Pace & Finish Time
+            document.getElementById('predictedPace').textContent = result.predicted_pace;
+            document.getElementById('predictedTime').textContent = result.predicted_time;
+            
+            // Card 2: 5K & 10K Projections
+            document.getElementById('predicted5k').textContent = result.predicted_5k_time;
+            document.getElementById('predicted10k').textContent = result.predicted_10k_time;
+            
+            // Card 3: Calories Burned
+            document.getElementById('caloriesBurned').textContent = result.calories_burned;
+            
+            // Card 4: Global Ranking
+            document.getElementById('globalPercentile').textContent = result.global_percentile + '%';
+            document.getElementById('topPercent').textContent = (100 - result.global_percentile).toFixed(1);
+            
+            // Card 5: Defense Exam Eligibility
+            const petEligibility = document.getElementById('petEligibility');
+            const eligibilityStatus = document.getElementById('eligibilityStatus');
+            
+            if (result.pet_eligibility.includes('Eligible')) {
+                petEligibility.textContent = 'ELIGIBLE';
+                petEligibility.className = 'text-lg font-bold text-athletic-success';
+                eligibilityStatus.textContent = '✓ Qualified';
+                eligibilityStatus.className = 'font-medium text-athletic-success';
+            } else {
+                petEligibility.textContent = 'NOT ELIGIBLE';
+                petEligibility.className = 'text-lg font-bold text-athletic-danger';
+                eligibilityStatus.textContent = '✗ Improvement Needed';
+                eligibilityStatus.className = 'font-medium text-athletic-danger';
+            }
+            
+            // Timestamp
+            const date = new Date(result.timestamp);
+            document.getElementById('timestamp').textContent = date.toLocaleString();
+            
+            // Animate cards
+            resultsDashboard.style.opacity = '0';
+            resultsDashboard.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                resultsDashboard.style.transition = 'all 0.5s ease';
+                resultsDashboard.style.opacity = '1';
+                resultsDashboard.style.transform = 'translateY(0)';
+            }, 100);
+        }
+        
+        function showError(message) {
+            errorMessage.classList.remove('hidden');
+            errorMessage.querySelector('p').textContent = 'Error: ' + message;
+            setTimeout(() => errorMessage.classList.add('hidden'), 5000);
+        }
+    </script>
+</body>
+</html>
